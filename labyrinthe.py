@@ -2,25 +2,48 @@ import random
 
 import matplotlib.pyplot as plt
 
-N_COLS = 30
-N_ROWS = 30
+N_COLS = 100
+N_ROWS = 100
+N_CELLS = N_ROWS * N_COLS
 
-PASSAGES = []
+PASSAGES = [[-1, 0], [N_CELLS - 1, N_CELLS]]
+
+STACK = [random.choice(range(N_CELLS))]
+VISITED = []
+
 
 plt.figure(figsize=(N_COLS, N_ROWS))
 plt.axis('off')
 
-for cell in list(range(N_COLS * N_ROWS - 1)):
-    if (cell + 1) % N_COLS == 0:  # sur le mur de droite
-        cell2 = cell + N_COLS
-    elif cell + N_COLS >= N_COLS * N_ROWS:  # sur le mur du haut
-        cell2 = cell + 1
+
+def all_neighbors(cell, N_COLS):
+    neighbors = []
+    if cell - N_COLS >= 0:
+        neighbors.append(cell - N_COLS)  # voisin du sud
+    if cell + N_COLS < N_CELLS:
+        neighbors.append(cell + N_COLS)  # voisin du nord
+    if cell % N_COLS != 0:
+        neighbors.append(cell - 1)  # voisin de l'ouest
+    if (cell + 1) % N_COLS != 0:
+        neighbors.append(cell + 1)  # voisin de l'est
+    return neighbors
+
+
+while STACK:
+    cell = STACK[-1]
+    VISITED.append(cell)
+    neighbors = all_neighbors(cell, N_COLS)
+    visitable = [cell for cell in neighbors if cell not in VISITED]
+    if visitable:
+        cell2 = random.choice(visitable)
+        PASSAGES.append(sorted([cell, cell2]))
+        STACK.append(cell2)
     else:
-        cell2 = random.choice([cell + 1, cell + N_COLS])
-    PASSAGES.append([cell, cell2])
+        STACK.pop()
 
 
-for cell in list(range(N_COLS * N_ROWS)):
+
+for cell in list(range(N_CELLS)):
     x = cell % N_COLS
     y = cell // N_COLS
     
